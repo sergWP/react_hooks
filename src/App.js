@@ -1,16 +1,29 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import {Container} from 'react-bootstrap';
 import './App.css';
 
-const calcValue = () => {
-    console.log('abbrval');
-    return Math.floor(Math.random() * (50 - 1) + 1);
-}
-
 const Slider = (props) => {
 
-    const [slide, setSlide] = useState(() => calcValue);
+    const [slide, setSlide] = useState(0);
     const [autoplay, setAutoplay] = useState(false);
+
+    function loggin() {
+        console.log('log!');
+    }
+
+    // Используя этот хук, вы говорите React сделать что-то после рендера. 
+    // React запомнит функцию (то есть «эффект»), которую вы передали и вызовет её после того, как внесёт все изменения в DOM
+    // следит за стейтом slide
+    // игнорирует autoplay
+    useEffect(() => {
+
+        document.title = `Slide: ${slide}`;
+        window.addEventListener('click', loggin);
+        return () => {
+            window.removeEventListener('click', loggin); // отписка от обработчика событий
+        }
+
+    }, [slide]); // второй арг. можно оставить пустым массивом - запуститься только 1 раз при первом рендере
 
     function changeSlide(i) {
         setSlide(slide => slide + i); // callback func: учитываем пред. состояние
@@ -43,9 +56,13 @@ const Slider = (props) => {
 
 
 function App() {
-  return (
-        <Slider/>
-  );
+    const [slider, setSlider] = useState(true);
+    return (
+        <>
+            <button onClick={() => setSlider(false)}>Click</button>
+            {slider ? <Slider/> : null}
+        </> 
+    );
 }
 
 export default App;
