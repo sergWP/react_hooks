@@ -1,6 +1,11 @@
-import {useState, useEffect, useCallback} from 'react';
+import {useState, useEffect, useCallback, useMemo} from 'react';
 import {Container} from 'react-bootstrap';
 import './App.css';
+
+const countTotal = (num) => {
+    console.log('countTotal!');
+    return num+10;
+}
 
 const Slider = (props) => {
 
@@ -8,6 +13,7 @@ const Slider = (props) => {
     const [autoplay, setAutoplay] = useState(false);
 
     // Это полезно при передаче колбэков оптимизированным дочерним(!) компонентам,
+    // мемоизирует функцию(!)
     const getSomeImages = useCallback(() => {
         console.log('useCallback!');
         return [
@@ -42,11 +48,25 @@ const Slider = (props) => {
         setAutoplay(autoplay => !autoplay);  // callback func
     }
 
+    // Возвращает мемоизированное значение (не перещитывается)
+    const total = useMemo(() => {
+        return countTotal(slide)
+    }, [slide]);
+
+    const style = useMemo(() => ({
+        color: slide > 4 ? 'red' : 'blue'
+    }), [slide]);
+
+    useEffect(() => {
+        console.log('styles!')
+    }, [style]);
+
     return (
         <Container>
             <div className="slider w-50 m-auto">
                 <Slide getSomeImages={getSomeImages} />
                 <div className="text-center mt-5">Active slide {slide}<br/>{autoplay ? 'auto' : null}</div>
+                <div style={style} className="text-center mt-5">Total slides {total}</div>
                 <div className="buttons mt-3">
                     <button 
                         className="btn btn-primary me-2"
